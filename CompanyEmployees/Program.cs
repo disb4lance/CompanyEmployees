@@ -2,6 +2,7 @@ using CompanyEmployees;
 using CompanyEmployees.Extensions;
 using Contracts;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 
 
@@ -20,8 +21,19 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Add services to the container.
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;  // чтобы мы сами могли ошибки показывать пользователю
+});
 
-builder.Services.AddControllers()
+
+builder.Services.AddControllers(config => {
+    config.RespectBrowserAcceptHeader = true;
+    config.ReturnHttpNotAcceptable = true; // 406 Not Acceptable если будет формат не поддерживающийся
+
+}).AddXmlDataContractSerializerFormatters() // поддержка форматирования xml
+ .AddCustomCSVFormatter()
+
     .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly); ;
 
 var app = builder.Build();
