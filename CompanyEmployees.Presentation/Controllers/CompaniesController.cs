@@ -61,6 +61,12 @@ IEnumerable<CompanyForCreationDto> companyCollection)
             createdCompany);
         }
 
+        [HttpDelete("{id:guid}")]
+        public IActionResult DeleteCompany(Guid id)
+        {
+            _service.CompanyService.DeleteCompany(id, trackChanges: false);
+            return NoContent();
+        }
 
 
 
